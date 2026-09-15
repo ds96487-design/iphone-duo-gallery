@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Duo Anthology — Exhibition Carousel</title>
+    
+    <!-- Google Fonts for Editorial Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --paper-card: rgba(20, 22, 28, 0.75);
+            --border-color: rgba(212, 175, 55, 0.2);
+            --gold-accent: #d4af37;
+            --titanium-silver: #e0e0e0;
+            --text-serif: 'Playfair Display', Georgia, serif;
+            --text-sans: 'Plus Jakarta Sans', sans-serif;
+            --text-display: 'Cinzel', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--titanium-silver);
+            font-family: var(--text-sans);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 20px;
+        }
+
+        /* Ambient Gallery Lighting */
+        .ambient-spotlight {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90vw;
+            height: 70vh;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(41, 151, 255, 0.03) 45%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Paper Grain Texture Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            opacity: 0.035;
+            z-index: 1000;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Header Section */
+        header {
+            text-align: center;
+            max-width: 800px;
+            z-index: 10;
+            margin-top: 20px;
+        }
+
+        .exhibition-label {
+            font-family: var(--text-display);
+            font-size: 0.75rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--gold-accent);
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        h1 {
+            font-family: var(--text-serif);
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 400;
+            color: #ffffff;
+            font-style: italic;
+            line-height: 1.2;
+        }
+
+        /* Carousel Outer Wrapper */
+        .carousel-viewport {
+            width: 100%;
+            max-width: 850px;
+            position: relative;
+            z-index: 10;
+            margin: 40px 0;
+        }
+
+        /* Carousel Track Container */
+        .carousel-track-container {
+            overflow: hidden;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
+        }
+
+        /* Individual Art Card Slide */
+        .carousel-slide {
+            min-width: 100%;
+            padding: 10px;
+        }
+
+        .art-card {
+            background: var(--paper-card);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 60px 50px;
+            border-radius: 4px;
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            transition: border-color 0.4s ease;
+        }
+
+        .art-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 4px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.4), transparent, rgba(255, 255, 255, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .quote-header {
+            font-family: var(--text-display);
+            font-size: 0.8rem;
+            letter-spacing: 0.25em;
+            color: var(--gold-accent);
+            opacity: 0.85;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quote-header::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: rgba(212, 175, 55, 0.15);
+            margin-left: 20px;
+        }
+
+        .quote-content {
+            font-family: var(--text-serif);
+            font-size: clamp(1.3rem, 2.5vw, 1.85rem);
+            line-height: 1.5;
+            color: #f5f5f7;
+            font-weight: 400;
+            font-style: italic;
+            margin-bottom: 40px;
+        }
+
+        .quote-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .theme-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #86868b;
+            font-weight: 500;
+        }
+
+        .copy-action {
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: var(--gold-accent);
+            font-family: var(--text-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 10px 22px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .copy-action:hover {
+            background: var(--gold-accent);
+            color: #000000;
+        }
+
+        /* Navigation Controls & Progress */
+        .controls-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 25px;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .nav-btn {
+            background: rgba(20, 22, 28, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--gold-accent);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover {
+            background: var(--gold-accent);
+            color: #000;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Indicators / Dots */
+        .carousel-indicators {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .dot.active {
+            background: var(--gold-accent);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .counter-display {
+            font-family: var(--text-display);
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            color: #86868b;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 30px;
+            font-family: var(--text-display);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: #6e6e73;
+            z-index: 10;
+        }
+
+        @media (max-width: 600px) {
+            .art-card { padding: 35px 25px; min-height: 420px; }
+            .nav-btn { width: 42px; height: 42px; font-size: 1rem; }
+            .carousel-indicators { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-spotlight"></div>
+
+    <header>
+        <span class="exhibition-label">Interactive Exhibition • Autumn 2026</span>
+        <h1>The iPhone 18 Duo Anthology</h1>
+    </header>
+
+    <div class="carousel-viewport">
+        <div class="carousel-track-container">
+            <div class="carousel-track" id="track">
+
+                <!-- Slide 1 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE I — ORIGAMI DEBT</div>
+                            <p class="quote-content">“The iPhone Duo folds in half, which is great because now my financial debt fits comfortably in my front pocket.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Aesthetics of Collapse</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE II — CRITIQUE</div>
+                            <p class="quote-content">“Apple called the iPhone Duo groundbreaking. My wallet called it a personal attack.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Financial Grief</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE III — OPTICS</div>
+                            <p class="quote-content">“The iPhone 18 Pro features a 2nm A20 chip and a 48MP variable aperture camera—perfect for ultra-HD photos of instant noodles.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">High Resolution Poverty</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 4 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE IV — COLLATERAL</div>
+                            <p class="quote-content">“Selling a kidney for an iPhone is so 2020. For the iPhone Duo, you need to put up your entire lineage as collateral.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Ancestral Sacrifice</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 5 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE V — GEOMETRY</div>
+                            <p class="quote-content">“The iPhone Duo folds horizontally, vertically, and mentally breaks anyone trying to calculate the EMI.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Multidimensional Stress</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 6 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE VI — DUALITY</div>
+                            <p class="quote-content">“Apple introduced a dual-display foldable. Now you can get ignored on two screens at the exact same time.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Stereo Solitude</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 7 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE VII — INTELLIGENCE</div>
+                            <p class="quote-content">“I asked Siri if I should buy the iPhone 18 Duo. She checked my bank account and started laughing.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Algorithmic Mockery</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 8 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE VIII — LUMINESCENCE</div>
+                            <p class="quote-content">“The iPhone 18 Pro Max display goes up to 3,000 nits—bright enough to light up your room and your complete lack of financial discipline.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Blinding Truth</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 9 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE IX — NOSTALGIA</div>
+                            <p class="quote-content">“Finally, an iPhone that folds! Now I can snap my phone shut with dramatic passive-aggression just like it’s 2004.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Tactile Catharsis</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Slide 10 -->
+                <div class="carousel-slide">
+                    <article class="art-card">
+                        <div>
+                            <div class="quote-header">PLATE X — METALLURGY</div>
+                            <p class="quote-content">“The iPhone Duo hinges are made of aerospace titanium, which is reassuring because my bank account is about to undergo atmospheric re-entry.”</p>
+                        </div>
+                        <div class="quote-footer">
+                            <span class="theme-tag">Aerospace Demise</span>
+                            <button class="copy-action" onclick="copyQuote(this)">Collect Quote</button>
+                        </div>
+                    </article>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-container">
+            <button class="nav-btn" id="prevBtn" aria-label="Previous Quote">&#10094;</button>
+            
+            <div class="carousel-indicators" id="dotsContainer"></div>
+            
+            <span class="counter-display" id="counter">01 / 10</span>
+
+            <button class="nav-btn" id="nextBtn" aria-label="Next Quote">&#10095;</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Curated Anthology • Unofficial Parody Series • 2026</p>
+    </footer>
+
+    <script>
+        const track = id('track');
+        const slides = Array.from(track.children);
+        const nextBtn = id('nextBtn');
+        const prevBtn = id('prevBtn');
+        const dotsContainer = id('dotsContainer');
+        const counter = id('counter');
+
+        let currentIndex = 0;
+        let startX = 0;
+        let isDragging = false;
+
+        function id(name) { return document.getElementById(name); }
+
+        // Build Indicator Dots
+        slides.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (idx === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(idx));
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = Array.from(dotsContainer.children);
+
+        function updateCarousel() {
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentIndex);
+            });
+
+            const currentFormatted = String(currentIndex + 1).padStart(2, '0');
+            const totalFormatted = String(slides.length).padStart(2, '0');
+            counter.innerText = `${currentFormatted} / ${totalFormatted}`;
+        }
+
+        function goToSlide(index) {
+            currentIndex = index;
+            updateCarousel();
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateCarousel();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            updateCarousel();
+        });
+
+        // Touch Swipe Navigation Support
+        track.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+        }, { passive: true });
+
+        track.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            const endX = e.changedTouches[0].clientX;
+            const diffX = startX - endX;
+
+            if (Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    currentIndex = (currentIndex + 1) % slides.length;
+                } else {
+                    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+                }
+                updateCarousel();
+            }
+            isDragging = false;
+        });
+
+        // Keyboard Arrow Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextBtn.click();
+            if (e.key === 'ArrowLeft') prevBtn.click();
+        });
+
+        // Copy Functionality
+        function copyQuote(button) {
+            const card = button.closest('.art-card');
+            const quoteText = card.querySelector('.quote-content').innerText;
+            
+            navigator.clipboard.writeText(quoteText).then(() => {
+                const originalText = button.innerText;
+                button.innerText = 'Acquired';
+                button.style.background = '#d4af37';
+                button.style.color = '#000000';
+                
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.style.background = 'transparent';
+                    button.style.color = 'var(--gold-accent)';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
